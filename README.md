@@ -1,0 +1,464 @@
+# EffectGraph 🎨
+
+**An AI-Friendly VFX Description Language and Runtime for Three.js**
+
+EffectGraph bridges the gap between natural language AI descriptions and production-quality visual effects by providing a structured, declarative system that both humans and AI can easily understand and generate.
+
+## 🌟 Why EffectGraph?
+
+Current AI systems struggle with creating sophisticated 3D visual effects because they require:
+- Deep WebGL/GLSL knowledge
+- Complex particle physics understanding
+- Low-level shader programming
+
+**EffectGraph solves this** by providing:
+- ✅ **Declarative JSON format** - AI can generate structured data easily
+- ✅ **Physics-aware** - Built-in realistic force simulations
+- ✅ **Compositional** - Mix and match proven effect patterns
+- ✅ **GPU-optimized** - Automatic performance optimization
+- ✅ **Iterative refinement** - Easy to modify parameters vs rewriting code
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+npm install
+npm run dev
+```
+
+Open your browser to the provided localhost URL to see the interactive demo.
+
+### Basic Usage
+
+```javascript
+import { ParticleSystem } from './src/index.js';
+
+// Define an effect using JSON
+const myEffect = {
+  name: "SimpleExplosion",
+  type: "particle",
+  
+  emitter: {
+    shape: "sphere",
+    radius: 0.5,
+    rate: { type: "constant", value: 50 }
+  },
+  
+  particles: {
+    maxCount: 500,
+    lifetime: { type: "uniform", min: 1.0, max: 2.0 },
+    initialVelocity: {
+      type: "uniform",
+      min: [-3, -3, -3],
+      max: [3, 3, 3]
+    }
+  },
+  
+  forces: [
+    { type: "gravity", strength: 9.8 },
+    { type: "drag", strength: 0.1 }
+  ],
+  
+  overLifetime: {
+    opacity: {
+      keyframes: [
+        { time: 0.0, value: 1.0, interpolation: "cubic" },
+        { time: 1.0, value: 0.0, interpolation: "cubic" }
+      ]
+    }
+  },
+  
+  rendering: {
+    material: {
+      type: "sprite",
+      blending: "additive"
+    }
+  }
+};
+
+// Create and add to scene
+const system = new ParticleSystem(myEffect);
+scene.add(system.getObject3D());
+
+// Update each frame
+function animate() {
+  system.update(deltaTime);
+}
+```
+
+## 📚 Core Concepts
+
+### 1. Effect Definition Structure
+
+Every effect is defined using a JSON structure with these main sections:
+
+```javascript
+{
+  name: "EffectName",
+  type: "particle" | "mesh" | "field" | "composite",
+  emitter: { ... },      // Where particles spawn
+  particles: { ... },    // Particle properties
+  forces: [ ... ],       // Physics forces
+  overLifetime: { ... }, // Property animation curves
+  rendering: { ... }     // Visual appearance
+}
+```
+
+### 2. Emitter Shapes
+
+Define where particles are created:
+
+- **Point** - Single point emission
+- **Sphere** - Surface or volume of sphere
+- **Box** - Rectangular volume
+- **Cone** - Cone-shaped emission (great for fire, smoke)
+
+### 3. Distribution Types
+
+Control randomness in particle properties:
+
+```javascript
+// Constant value
+{ type: "constant", value: 10 }
+
+// Random uniform distribution
+{ type: "uniform", min: 5, max: 15 }
+
+// Normal (Gaussian) distribution
+{ type: "normal", mean: 10, stddev: 2 }
+```
+
+### 4. Forces
+
+Built-in physics simulations:
+
+- **Gravity** - Downward acceleration
+- **Drag** - Air resistance (opposes motion)
+- **Turbulence** - Noise-based chaotic motion
+- **Vortex** - Spiral motion around axis
+- **Attractor** - Pull toward point
+- **Wind** - Directional force with gusts
+- **Buoyancy** - Upward force (hot air rising)
+
+### 5. Over-Lifetime Curves
+
+Animate properties over particle lifetime using keyframes:
+
+```javascript
+overLifetime: {
+  scale: {
+    keyframes: [
+      { time: 0.0, value: [0.1, 0.1, 0.1], interpolation: "cubic" },
+      { time: 1.0, value: [1.0, 1.0, 1.0], interpolation: "cubic" }
+    ]
+  },
+  color: {
+    keyframes: [
+      { time: 0.0, value: [1.0, 0.5, 0.0], interpolation: "linear" },
+      { time: 1.0, value: [0.2, 0.0, 0.0], interpolation: "linear" }
+    ]
+  }
+}
+```
+
+Interpolation types: `linear`, `cubic`, `step`, `bezier`
+
+## 🎯 Example Effects
+
+### Fire Effect
+
+```javascript
+import { fireEffect } from './src/examples/fire.js';
+const system = new ParticleSystem(fireEffect);
+```
+
+Realistic fire with:
+- Upward buoyancy force
+- Turbulent motion
+- Color transition: bright yellow → orange → dark red
+- Scale growth over lifetime
+- Additive blending
+
+### Explosion Effect
+
+```javascript
+import { explosionEffect } from './src/examples/explosion.js';
+const system = new ParticleSystem(explosionEffect);
+```
+
+Burst emission with:
+- Radial outward velocity
+- Gravity pulling debris down
+- Flash → fire → smoke color progression
+- Rapid expansion then contraction
+
+### Sparkles Effect
+
+```javascript
+import { sparklesEffect } from './src/examples/sparkles.js';
+const system = new ParticleSystem(sparklesEffect);
+```
+
+Magical glitter with:
+- Sphere emission volume
+- Gentle turbulence
+- Color cycling through rainbow
+- Pulsing scale animation
+
+## 🤖 AI Integration Guide
+
+### For AI Model Developers
+
+EffectGraph is designed to be generated by AI. Here's how to integrate:
+
+#### 1. Training Data Format
+
+Your AI should learn to map natural language to EffectGraph JSON:
+
+**Input**: "Create a magical portal with swirling energy"
+
+**Output**:
+```json
+{
+  "name": "MagicalPortal",
+  "type": "particle",
+  "emitter": {
+    "shape": "cone",
+    "radius": 1.0,
+    "angle": 5,
+    "rate": { "type": "constant", "value": 100 }
+  },
+  "forces": [
+    {
+      "type": "vortex",
+      "strength": 10.0,
+      "parameters": {
+        "center": [0, 0, 0],
+        "axis": [0, 1, 0],
+        "radius": 3.0
+      }
+    }
+  ],
+  "overLifetime": {
+    "color": {
+      "keyframes": [
+        { "time": 0.0, "value": [0.3, 0.5, 1.0], "interpolation": "linear" },
+        { "time": 1.0, "value": [0.8, 0.2, 1.0], "interpolation": "linear" }
+      ]
+    }
+  },
+  "rendering": {
+    "material": {
+      "blending": "additive"
+    }
+  }
+}
+```
+
+#### 2. Semantic Understanding
+
+Train your AI to understand these relationships:
+
+**Physics**:
+- Gravity → downward motion
+- Drag → slowing over time
+- Buoyancy → upward motion (fire, hot air)
+- Turbulence → chaotic, organic motion
+
+**Visual**:
+- Fire → additive blending, yellow-to-red colors
+- Smoke → normal/multiply blending, gray colors
+- Magic → additive blending, vibrant colors
+- Water → translucent, blue-white colors
+
+**Temporal**:
+- Short lifetime → quick effects (sparks, debris)
+- Long lifetime → ambient effects (smoke, fog)
+- Fade in/out → smooth appearance/disappearance
+
+#### 3. Compositional Patterns
+
+Common effect compositions:
+
+**Fire = Core Flame + Smoke + Embers**
+```javascript
+{
+  "type": "composite",
+  "layers": [
+    { /* bright additive core */ },
+    { /* darker smoke */ },
+    { /* small spark particles */ }
+  ]
+}
+```
+
+**Explosion = Flash + Shockwave + Debris + Smoke**
+**Waterfall = Water particles + Mist + Splash + Foam**
+
+#### 4. Prompt Engineering
+
+When asking AI to generate effects:
+
+```
+Generate an EffectGraph JSON definition for a [EFFECT_TYPE] with:
+
+Physical properties:
+- Emission rate: [PARTICLES_PER_SECOND]
+- Lifetime: [DURATION_SECONDS]
+- Primary motion: [DIRECTION/BEHAVIOR]
+- Forces: [FORCE_LIST]
+
+Visual appearance:
+- Color: [START_COLOR] → [END_COLOR]
+- Size: [START_SIZE] → [END_SIZE]
+- Blending: [additive/normal/multiply]
+
+Style reference:
+- Similar to: [EXISTING_EFFECT]
+```
+
+#### 5. Constraints & Validation
+
+Ensure AI-generated effects satisfy:
+
+```javascript
+{
+  maxParticles: 10000,        // Performance limit
+  lifetimeRange: [0.1, 10.0], // Reasonable durations
+  velocityRange: [-100, 100], // Realistic speeds
+  forceMax: 50.0,            // Prevent simulation explosion
+  
+  // Visual coherence
+  colorValid: true,           // RGB in [0,1] range
+  blendingCompatible: true    // Correct layer order
+}
+```
+
+## 🏗️ Project Structure
+
+```
+effectgraph/
+├── src/
+│   ├── core/
+│   │   ├── types.js           # Type definitions & distributions
+│   │   ├── Particle.js        # Particle class
+│   │   ├── Emitter.js         # Emitter shapes
+│   │   └── ParticleSystem.js  # Main system class
+│   ├── forces/
+│   │   └── Force.js           # All force implementations
+│   ├── math/
+│   │   └── curve.js           # Curve evaluation & interpolation
+│   ├── examples/
+│   │   ├── fire.js            # Fire effect example
+│   │   ├── smoke.js           # Smoke effect example
+│   │   ├── explosion.js       # Explosion effect example
+│   │   └── sparkles.js        # Sparkles effect example
+│   └── index.js               # Main exports
+├── public/                    # Static assets
+├── index.html                 # Demo page
+├── main.js                    # Demo application
+└── package.json
+```
+
+## 🔬 Mathematical Foundation
+
+### Particle Dynamics
+
+Position integration using Velocity Verlet:
+
+```
+x(t + Δt) = x(t) + v(t)·Δt + ½a(t)·Δt²
+v(t + Δt) = v(t) + ½[a(t) + a(t + Δt)]·Δt
+```
+
+Force accumulation:
+```
+F_total = Σ F_i
+a = F_total / m
+```
+
+### Noise-Based Motion
+
+Turbulence using layered Simplex noise:
+
+```
+turbulence(p, t) = Σ(i=0 to octaves) amplitude_i · noise(frequency_i · p + t)
+  where amplitude_i = persistence^i
+        frequency_i = 2^i
+```
+
+### Interpolation
+
+Hermite cubic interpolation for smooth curves:
+
+```
+h(t) = (2t³ - 3t² + 1)·p₀ + 
+       (t³ - 2t² + t)·m₀ + 
+       (-2t³ + 3t²)·p₁ + 
+       (t³ - t²)·m₁
+```
+
+## 🎓 Advanced Topics
+
+### Custom Forces
+
+Create your own force types:
+
+```javascript
+import { Force } from './src/forces/Force.js';
+
+class CustomForce extends Force {
+  calculate(particle) {
+    // Your force calculation
+    return new THREE.Vector3(fx, fy, fz);
+  }
+}
+```
+
+### GPU Simulation
+
+For effects with >10,000 particles, implement GPU compute shaders for position updates.
+
+### LOD (Level of Detail)
+
+Automatically reduce particle count based on camera distance:
+
+```javascript
+optimization: {
+  lod: [
+    { distance: 0, particleCount: 1.0 },
+    { distance: 50, particleCount: 0.5 },
+    { distance: 100, particleCount: 0.2 }
+  ]
+}
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Areas of interest:
+
+- New force types (magnetism, fluid flow, etc.)
+- Additional emitter shapes (mesh surface emission)
+- Material types (trails, ribbons)
+- Collision detection
+- Performance optimizations
+- Example effects library
+- AI training datasets
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+## 🙏 Acknowledgments
+
+Inspired by:
+- Unreal Engine's Niagara VFX system
+- Unity's Shuriken particle system
+- Houdini's procedural workflows
+
+Built for the AI generation revolution in creative tools.
+
+---
+
+**Made with ❤️ for AI-powered creativity**
