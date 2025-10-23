@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EffectGraph - Minimal Example</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    h1 {
+      margin: 0 0 20px 0;
+    }
+    #canvas {
+      border: 1px solid #444;
+      display: block;
+      background: #000;
+    }
+    #stats {
+      margin-top: 10px;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <h1>EffectGraph - Minimal Example</h1>
+  <canvas id="canvas"></canvas>
+  <div id="stats">Loading...</div>
+  
+  <script type="module" src="./minimal.ts"></script>
+</body>
+</html>
