@@ -1,0 +1,41 @@
+{
+  "name": "explosion-small",
+  "description": "Small quick explosive burst",
+  "tags": ["explosion", "fire", "quick", "impact"],
+  "suggestedQuality": "medium",
+  "emitters": [
+    {
+      "type": "sphere",
+      "rate": 2000,
+      "maxParticles": 3000,
+      "lifetime": [0.3, 0.8],
+      "velocityRange": {
+        "min": [-5, -5, -5],
+        "max": [5, 5, 5]
+      },
+      "position": [0, 0, 0],
+      "params": {
+        "radius": 0.3
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, -3, 0],
+    "drag": 0.8
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "explosion",
+    "particleSize": 5,
+    "sizeAttenuation": true,
+    "blendMode": "additive",
+    "postProcessing": {
+      "bloom": {
+        "enabled": true,
+        "strength": 1.2,
+        "threshold": 0.8
+      }
+    }
+  },
+  "duration": 1
+}

@@ -1,0 +1,43 @@
+{
+  "name": "fire-spark",
+  "description": "Upward sparks like from a fire",
+  "tags": ["fire", "sparks", "embers", "heat"],
+  "suggestedQuality": "medium",
+  "emitters": [
+    {
+      "type": "cone",
+      "rate": 500,
+      "maxParticles": 3000,
+      "lifetime": [0.5, 2],
+      "velocityRange": {
+        "min": [-0.5, 3, -0.5],
+        "max": [0.5, 6, 0.5]
+      },
+      "position": [0, 0, 0],
+      "params": {
+        "angle": 15
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, -1, 0],
+    "drag": 0.3,
+    "curlNoise": true,
+    "curlNoiseFrequency": 1.5,
+    "curlNoiseAmplitude": 0.5
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "explosion",
+    "particleSize": 3,
+    "sizeAttenuation": true,
+    "blendMode": "additive",
+    "postProcessing": {
+      "bloom": {
+        "enabled": true,
+        "strength": 1.0
+      }
+    }
+  },
+  "duration": 0
+}

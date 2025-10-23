@@ -1,0 +1,41 @@
+{
+  "name": "smoke-spiral",
+  "description": "Swirling smoke with vorticity",
+  "tags": ["smoke", "vortex", "atmospheric"],
+  "suggestedQuality": "high",
+  "emitters": [
+    {
+      "type": "point",
+      "rate": 200,
+      "maxParticles": 5000,
+      "lifetime": [3, 5],
+      "velocityRange": {
+        "min": [-0.5, 1, -0.5],
+        "max": [0.5, 2, 0.5]
+      },
+      "position": [0, -2, 0]
+    }
+  ],
+  "physics": {
+    "gravity": [0, 0.5, 0],
+    "drag": 0.1,
+    "curlNoise": true,
+    "curlNoiseFrequency": 0.5,
+    "curlNoiseAmplitude": 2,
+    "vorticity": true,
+    "vorticityStrength": 3
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "smoke",
+    "particleSize": 15,
+    "sizeAttenuation": true,
+    "blendMode": "alpha",
+    "postProcessing": {
+      "bloom": {
+        "enabled": false
+      }
+    }
+  },
+  "duration": 0
+}

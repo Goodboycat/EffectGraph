@@ -1,0 +1,44 @@
+{
+  "name": "explosion-large",
+  "description": "Large explosive burst with fire and smoke",
+  "tags": ["explosion", "fire", "action", "dramatic"],
+  "suggestedQuality": "high",
+  "emitters": [
+    {
+      "type": "sphere",
+      "rate": 5000,
+      "maxParticles": 10000,
+      "lifetime": [0.5, 1.5],
+      "velocityRange": {
+        "min": [-8, -8, -8],
+        "max": [8, 8, 8]
+      },
+      "position": [0, 0, 0],
+      "params": {
+        "radius": 0.5
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, -2, 0],
+    "drag": 0.5,
+    "curlNoise": false,
+    "vorticity": false
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "explosion",
+    "particleSize": 8,
+    "sizeAttenuation": true,
+    "blendMode": "additive",
+    "postProcessing": {
+      "bloom": {
+        "enabled": true,
+        "strength": 1.5,
+        "radius": 0.8,
+        "threshold": 0.7
+      }
+    }
+  },
+  "duration": 2
+}

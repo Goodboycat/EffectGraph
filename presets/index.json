@@ -1,0 +1,86 @@
+[
+  {
+    "name": "explosion-large",
+    "description": "Large explosive burst with fire and smoke",
+    "tags": ["explosion", "fire", "action", "dramatic"],
+    "recommendedMode": "gpu",
+    "performanceHint": "heavy"
+  },
+  {
+    "name": "explosion-small",
+    "description": "Small quick explosive burst",
+    "tags": ["explosion", "fire", "quick", "impact"],
+    "recommendedMode": "gpu",
+    "performanceHint": "medium"
+  },
+  {
+    "name": "smoke-spiral",
+    "description": "Swirling smoke with vorticity",
+    "tags": ["smoke", "vortex", "atmospheric"],
+    "recommendedMode": "gpu",
+    "performanceHint": "medium"
+  },
+  {
+    "name": "smoke-dense",
+    "description": "Heavy dense smoke cloud",
+    "tags": ["smoke", "dense", "atmospheric", "fog"],
+    "recommendedMode": "gpu",
+    "performanceHint": "heavy"
+  },
+  {
+    "name": "fire-spark",
+    "description": "Upward sparks like from a fire",
+    "tags": ["fire", "sparks", "embers", "heat"],
+    "recommendedMode": "gpu",
+    "performanceHint": "medium"
+  },
+  {
+    "name": "fire-embers",
+    "description": "Floating fire embers and glowing particles",
+    "tags": ["fire", "embers", "floating", "ambient"],
+    "recommendedMode": "cpu",
+    "performanceHint": "light"
+  },
+  {
+    "name": "aurora",
+    "description": "Aurora borealis effect with flowing colored particles",
+    "tags": ["aurora", "magical", "colorful", "atmospheric"],
+    "recommendedMode": "gpu",
+    "performanceHint": "heavy"
+  },
+  {
+    "name": "plasma-beam",
+    "description": "Concentrated plasma beam effect",
+    "tags": ["energy", "beam", "sci-fi", "bright"],
+    "recommendedMode": "gpu",
+    "performanceHint": "medium"
+  },
+  {
+    "name": "magic-swirl",
+    "description": "Magical swirling particles with rainbow colors",
+    "tags": ["magic", "swirl", "colorful", "fantasy"],
+    "recommendedMode": "gpu",
+    "performanceHint": "heavy"
+  },
+  {
+    "name": "water-spray",
+    "description": "Water spray particles with gravity",
+    "tags": ["water", "splash", "liquid", "physics"],
+    "recommendedMode": "cpu",
+    "performanceHint": "medium"
+  },
+  {
+    "name": "dust-cloud",
+    "description": "Dusty particles floating in air",
+    "tags": ["dust", "ambient", "atmospheric", "subtle"],
+    "recommendedMode": "cpu",
+    "performanceHint": "light"
+  },
+  {
+    "name": "ember-trails",
+    "description": "Trailing ember particles with motion",
+    "tags": ["fire", "embers", "trails", "motion"],
+    "recommendedMode": "gpu",
+    "performanceHint": "medium"
+  }
+]

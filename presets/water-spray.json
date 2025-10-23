@@ -1,0 +1,35 @@
+{
+  "name": "water-spray",
+  "description": "Water spray particles with gravity",
+  "tags": ["water", "splash", "liquid", "physics"],
+  "suggestedQuality": "medium",
+  "emitters": [
+    {
+      "type": "cone",
+      "rate": 600,
+      "maxParticles": 4000,
+      "lifetime": [0.8, 1.5],
+      "velocityRange": {
+        "min": [-2, 4, -2],
+        "max": [2, 8, 2]
+      },
+      "position": [0, 0, 0],
+      "params": {
+        "angle": 25
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, -9.8, 0],
+    "drag": 0.4,
+    "curlNoise": false
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "magic_swirl",
+    "particleSize": 4,
+    "sizeAttenuation": true,
+    "blendMode": "alpha"
+  },
+  "duration": 0
+}

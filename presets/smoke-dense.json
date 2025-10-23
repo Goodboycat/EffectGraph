@@ -1,0 +1,37 @@
+{
+  "name": "smoke-dense",
+  "description": "Heavy dense smoke cloud",
+  "tags": ["smoke", "dense", "atmospheric", "fog"],
+  "suggestedQuality": "high",
+  "emitters": [
+    {
+      "type": "box",
+      "rate": 300,
+      "maxParticles": 8000,
+      "lifetime": [4, 6],
+      "velocityRange": {
+        "min": [-0.3, 0.5, -0.3],
+        "max": [0.3, 1.5, 0.3]
+      },
+      "position": [0, -1, 0],
+      "params": {
+        "size": [2, 0.5, 2]
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, 0.3, 0],
+    "drag": 0.05,
+    "curlNoise": true,
+    "curlNoiseFrequency": 0.3,
+    "curlNoiseAmplitude": 1.5
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "smoke",
+    "particleSize": 20,
+    "sizeAttenuation": true,
+    "blendMode": "alpha"
+  },
+  "duration": 0
+}

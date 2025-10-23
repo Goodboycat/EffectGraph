@@ -101,9 +101,6 @@ export class CPUCanvasRunner implements EffectHandle {
     worldPos: [number, number, number]
   ): [number, number, number] | null {
     // Simple perspective projection
-    const camDist = Math.sqrt(
-      this.cameraPos[0] ** 2 + this.cameraPos[1] ** 2 + this.cameraPos[2] ** 2
-    );
 
     // Transform to camera space
     const relX = worldPos[0] - this.cameraLookAt[0];
@@ -207,7 +204,7 @@ export class CPUCanvasRunner implements EffectHandle {
     return `rgba(${Math.floor(r * 255)}, ${Math.floor(g * 255)}, ${Math.floor(b * 255)}, ${a})`;
   }
 
-  private getParticleSize(age: number, depth: number): number {
+  private getParticleSize(age: number, _depth: number): number {
     const baseSize = this.spec.renderer.particleSize;
     const template = this.spec.renderer.shaderTemplate || 'smoke';
 
@@ -228,7 +225,14 @@ export class CPUCanvasRunner implements EffectHandle {
     return baseSize * sizeMultiplier;
   }
 
-  private drawParticle(x: number, y: number, size: number, color: string, life: number): void {
+  private drawParticle(
+    x: number,
+    y: number,
+    size: number,
+    color: string,
+    life: number,
+    _depth?: number
+  ): void {
     const radius = size / 2;
 
     // Create radial gradient for soft particle

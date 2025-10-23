@@ -1,0 +1,37 @@
+{
+  "name": "dust-cloud",
+  "description": "Dusty particles floating in air",
+  "tags": ["dust", "ambient", "atmospheric", "subtle"],
+  "suggestedQuality": "low",
+  "emitters": [
+    {
+      "type": "box",
+      "rate": 50,
+      "maxParticles": 1500,
+      "lifetime": [5, 10],
+      "velocityRange": {
+        "min": [-0.1, -0.2, -0.1],
+        "max": [0.1, 0.1, 0.1]
+      },
+      "position": [0, 2, 0],
+      "params": {
+        "size": [5, 3, 5]
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, -0.05, 0],
+    "drag": 0.02,
+    "curlNoise": true,
+    "curlNoiseFrequency": 0.2,
+    "curlNoiseAmplitude": 0.3
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "smoke",
+    "particleSize": 6,
+    "sizeAttenuation": true,
+    "blendMode": "alpha"
+  },
+  "duration": 0
+}

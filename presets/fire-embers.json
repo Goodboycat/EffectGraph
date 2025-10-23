@@ -1,0 +1,43 @@
+{
+  "name": "fire-embers",
+  "description": "Floating fire embers and glowing particles",
+  "tags": ["fire", "embers", "floating", "ambient"],
+  "suggestedQuality": "medium",
+  "emitters": [
+    {
+      "type": "box",
+      "rate": 100,
+      "maxParticles": 2000,
+      "lifetime": [3, 5],
+      "velocityRange": {
+        "min": [-0.2, 0.5, -0.2],
+        "max": [0.2, 1.5, 0.2]
+      },
+      "position": [0, 0, 0],
+      "params": {
+        "size": [3, 1, 3]
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, 0.2, 0],
+    "drag": 0.2,
+    "curlNoise": true,
+    "curlNoiseFrequency": 0.8,
+    "curlNoiseAmplitude": 1.0
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "explosion",
+    "particleSize": 4,
+    "sizeAttenuation": true,
+    "blendMode": "additive",
+    "postProcessing": {
+      "bloom": {
+        "enabled": true,
+        "strength": 0.8
+      }
+    }
+  },
+  "duration": 0
+}

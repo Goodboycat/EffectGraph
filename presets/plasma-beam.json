@@ -1,0 +1,42 @@
+{
+  "name": "plasma-beam",
+  "description": "Concentrated plasma beam effect",
+  "tags": ["energy", "beam", "sci-fi", "bright"],
+  "suggestedQuality": "medium",
+  "emitters": [
+    {
+      "type": "cone",
+      "rate": 800,
+      "maxParticles": 4000,
+      "lifetime": [0.3, 0.8],
+      "velocityRange": {
+        "min": [0, 0, 8],
+        "max": [0, 0, 12]
+      },
+      "position": [0, 0, -5],
+      "params": {
+        "angle": 5
+      }
+    }
+  ],
+  "physics": {
+    "gravity": [0, 0, 0],
+    "drag": 0.1,
+    "curlNoise": false
+  },
+  "renderer": {
+    "mode": "auto",
+    "shaderTemplate": "magic_swirl",
+    "particleSize": 6,
+    "sizeAttenuation": true,
+    "blendMode": "additive",
+    "postProcessing": {
+      "bloom": {
+        "enabled": true,
+        "strength": 2.0,
+        "threshold": 0.5
+      }
+    }
+  },
+  "duration": 0
+}

@@ -26,14 +26,11 @@ export class GPUEffectRenderer implements EffectHandle {
   private animationId: number | null = null;
   private startTime: number = 0;
   private lastTime: number = 0;
-  private accumulatedTime: number = 0;
 
   // Particle data arrays
   private positions: Float32Array;
   private ages: Float32Array;
   private customData: Float32Array;
-  private velocities: Float32Array;
-  private lifetimes: Float32Array;
 
   private maxParticles: number;
   private particles: Particle[] = [];
@@ -83,8 +80,6 @@ export class GPUEffectRenderer implements EffectHandle {
     this.positions = new Float32Array(this.maxParticles * 3);
     this.ages = new Float32Array(this.maxParticles);
     this.customData = new Float32Array(this.maxParticles * 4);
-    this.velocities = new Float32Array(this.maxParticles * 3);
-    this.lifetimes = new Float32Array(this.maxParticles);
 
     // Initialize emit times for each emitter
     this.nextEmitTimes = spec.emitters.map(() => 0);
@@ -319,7 +314,7 @@ export class GPUEffectRenderer implements EffectHandle {
     this.updateBuffers();
   }
 
-  private emitParticle(emitter: any, emitterIdx: number): void {
+  private emitParticle(emitter: any, _emitterIdx: number): void {
     const particle = this.pool.acquire();
     if (!particle) return;
 
