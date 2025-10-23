@@ -1,29 +1,65 @@
 {
   "name": "effectgraph",
   "version": "1.0.0",
-  "description": "AI-friendly VFX description language and runtime for Three.js",
+  "description": "GPU-ready, AI-friendly particle & special-effects tooling for web usage",
   "type": "module",
-  "main": "src/index.js",
+  "main": "./dist/effectgraph.umd.js",
+  "module": "./dist/effectgraph.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/effectgraph.esm.js",
+      "require": "./dist/effectgraph.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "presets",
+    "schema"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.ts\" \"examples/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "check-examples": "node scripts/check-examples.js"
   },
   "keywords": [
-    "vfx",
-    "particles",
+    "particle-system",
+    "gpu",
+    "webgl",
     "three.js",
-    "ai",
-    "procedural",
-    "effects"
+    "effects",
+    "vfx",
+    "ai-friendly"
   ],
-  "author": "EffectGraph Team",
+  "author": "",
   "license": "MIT",
-  "dependencies": {
-    "three": "^0.160.0",
-    "simplex-noise": "^4.0.1"
+  "peerDependencies": {
+    "three": "^0.160.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "@types/node": "^20.10.6",
+    "@types/three": "^0.160.0",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "jsdom": "^23.0.1",
+    "prettier": "^3.1.1",
+    "three": "^0.160.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-dts": "^3.7.0",
+    "vitest": "^1.1.0",
+    "zod": "^3.22.4"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
   }
 }
