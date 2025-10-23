@@ -4,6 +4,8 @@
 
 EffectGraph bridges the gap between natural language AI descriptions and production-quality visual effects by providing a structured, declarative system that both humans and AI can easily understand and generate.
 
+https://goodboycat.github.io/EffectGraph
+
 ## 🌟 Why EffectGraph?
 
 Current AI systems struggle with creating sophisticated 3D visual effects because they require:
