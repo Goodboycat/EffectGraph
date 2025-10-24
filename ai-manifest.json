@@ -1,0 +1,200 @@
+{
+  "name": "EffectGraph",
+  "version": "1.0.0",
+  "description": "GPU-ready, AI-friendly particle & special-effects library for web",
+  "aiReadiness": {
+    "structured": true,
+    "deterministic": true,
+    "validated": true,
+    "constrained": true
+  },
+  "schema": {
+    "version": "1.0",
+    "location": "./schema/effect-spec.json",
+    "format": "JSON Schema Draft-07"
+  },
+  "presets": {
+    "location": "./presets/",
+    "index": "./presets/index.json",
+    "count": 12,
+    "list": [
+      "explosion-large",
+      "explosion-small",
+      "smoke-spiral",
+      "smoke-dense",
+      "fire-spark",
+      "fire-embers",
+      "aurora",
+      "plasma-beam",
+      "magic-swirl",
+      "water-spray",
+      "dust-cloud",
+      "ember-trails"
+    ]
+  },
+  "limits": {
+    "maxParticles": 200000,
+    "defaultMaxParticles": 65536,
+    "maxTextureSize": 2048,
+    "maxEmitRate": 200000,
+    "maxEmitters": 10,
+    "maxLifetime": 60,
+    "maxColorStops": 16
+  },
+  "parameters": {
+    "emitter": {
+      "type": {
+        "type": "enum",
+        "values": ["point", "sphere", "box", "cone"],
+        "description": "Emitter shape"
+      },
+      "rate": {
+        "type": "number",
+        "min": 0,
+        "max": 200000,
+        "default": 100,
+        "unit": "particles/second",
+        "description": "Particle emission rate"
+      },
+      "maxParticles": {
+        "type": "integer",
+        "min": 1,
+        "max": 200000,
+        "default": 65536,
+        "description": "Maximum active particles"
+      },
+      "lifetime": {
+        "type": "range",
+        "min": 0.01,
+        "max": 60,
+        "unit": "seconds",
+        "description": "Particle lifetime range [min, max]"
+      }
+    },
+    "physics": {
+      "gravity": {
+        "type": "vector3",
+        "default": [0, -9.8, 0],
+        "unit": "m/s²",
+        "description": "Gravity acceleration"
+      },
+      "drag": {
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.01,
+        "description": "Air drag coefficient"
+      },
+      "curlNoise": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable curl noise turbulence"
+      },
+      "vorticity": {
+        "type": "boolean",
+        "default": false,
+        "description": "Enable vorticity confinement (swirling)"
+      }
+    },
+    "renderer": {
+      "mode": {
+        "type": "enum",
+        "values": ["auto", "gpu", "cpu"],
+        "default": "auto",
+        "description": "Rendering mode selection"
+      },
+      "shaderTemplate": {
+        "type": "enum",
+        "values": ["smoke", "explosion", "magic_swirl", "custom"],
+        "description": "Visual appearance template"
+      },
+      "particleSize": {
+        "type": "number",
+        "min": 0.1,
+        "max": 100,
+        "default": 2.0,
+        "unit": "pixels",
+        "description": "Base particle size"
+      },
+      "blendMode": {
+        "type": "enum",
+        "values": ["additive", "alpha", "multiply"],
+        "default": "additive",
+        "description": "Particle blending mode"
+      }
+    }
+  },
+  "commonPatterns": {
+    "increaseIntensity": {
+      "description": "Make effect more intense/dramatic",
+      "modifications": [
+        "Increase emitter.rate by 50-100%",
+        "Increase emitter.maxParticles by 50-100%",
+        "Increase renderer.particleSize by 20-50%",
+        "Enable postProcessing.bloom"
+      ]
+    },
+    "decreasePerformanceCost": {
+      "description": "Reduce computational cost",
+      "modifications": [
+        "Decrease emitter.rate by 50%",
+        "Decrease emitter.maxParticles by 50%",
+        "Disable physics.curlNoise",
+        "Disable physics.vorticity",
+        "Set renderer.mode to 'cpu' for simple effects"
+      ]
+    },
+    "makeSlower": {
+      "description": "Slow down particle motion",
+      "modifications": [
+        "Reduce velocityRange.min and velocityRange.max by 50%",
+        "Increase physics.drag to 0.5-0.8",
+        "Increase emitter.lifetime by 50-100%"
+      ]
+    },
+    "makeFaster": {
+      "description": "Speed up particle motion",
+      "modifications": [
+        "Increase velocityRange.min and velocityRange.max by 100%",
+        "Decrease physics.drag to 0.01-0.05",
+        "Decrease emitter.lifetime by 30-50%"
+      ]
+    },
+    "addTurbulence": {
+      "description": "Add chaotic, swirling motion",
+      "modifications": [
+        "Set physics.curlNoise to true",
+        "Set physics.curlNoiseAmplitude to 1.5-3.0",
+        "Set physics.vorticity to true",
+        "Set physics.vorticityStrength to 2.0-5.0"
+      ]
+    }
+  },
+  "usage": {
+    "basic": "import { renderEffectToCanvas, getPreset } from 'effectgraph'; const handle = await renderEffectToCanvas(getPreset('explosion-large'), canvas);",
+    "validation": "import { validateEffectSpec } from 'effectgraph'; const result = validateEffectSpec(spec); if (result.valid) { use(result.spec); }",
+    "headless": "import { renderEffectToImage } from 'effectgraph'; const blob = await renderEffectToImage(preset, { width: 1920, height: 1080 });"
+  },
+  "aiGuidance": {
+    "whenToUsePresets": "Always start with a preset when creating effects. Presets are pre-validated and performance-tested.",
+    "commonMistakes": [
+      "Setting maxParticles > 200000 (will be clamped)",
+      "Inverting lifetime range (min > max) (validation error)",
+      "Forgetting required fields (emitters, physics, renderer)",
+      "Setting rate too high without adjusting maxParticles"
+    ],
+    "performanceTips": [
+      "For <2000 particles, CPU mode often performs equally well",
+      "For >10000 particles, always use GPU mode",
+      "Curl noise and vorticity add ~20-30% overhead",
+      "Bloom post-processing adds ~10-15% overhead"
+    ],
+    "creativeGuidance": {
+      "fire": "Use explosion template, high velocity, low drag, additive blend, orange/yellow colors",
+      "smoke": "Use smoke template, low velocity, high drag, alpha blend, gray colors, enable curl noise",
+      "magic": "Use magic_swirl template, moderate velocity, additive blend, enable vorticity, colorful",
+      "explosion": "High rate (5000+), short lifetime (0.5-1.5s), sphere emitter, additive blend, bloom",
+      "ambient": "Low rate (<100), long lifetime (5-10s), box emitter, alpha blend, no post-processing"
+    }
+  }
+}

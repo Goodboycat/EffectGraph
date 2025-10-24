@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EffectGraph - GPU Particle Effects Library</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      font-size: 1.2em;
+      color: #aaa;
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+    
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .sidebar {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar h2 {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: #4facfe;
+    }
+    
+    .preset-list {
+      list-style: none;
+    }
+    
+    .preset-list li {
+      padding: 10px;
+      margin: 5px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+    
+    .preset-list li:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-left-color: #4facfe;
+    }
+    
+    .preset-list li.active {
+      background: rgba(79, 172, 254, 0.2);
+      border-left-color: #4facfe;
+    }
+    
+    .preset-tags {
+      font-size: 0.85em;
+      color: #888;
+      margin-top: 5px;
+    }
+    
+    .canvas-container {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    canvas {
+      width: 100%;
+      height: 600px;
+      border-radius: 8px;
+      background: #000;
+      display: block;
+    }
+    
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    label {
+      font-size: 0.9em;
+      color: #aaa;
+    }
+    
+    input[type="number"],
+    input[type="range"],
+    select {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+    }
+    
+    input[type="range"] {
+      width: 150px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .stats {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .stats-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    
+    .stats-label {
+      color: #4facfe;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #1a1a2e;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow: auto;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+    
+    pre {
+      background: #0a0a0a;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 EffectGraph</h1>
+      <p class="subtitle">GPU-Ready, AI-Friendly Particle & Special Effects</p>
+    </header>
+    
+    <div class="main-content">
+      <aside class="sidebar">
+        <h2>Presets</h2>
+        <ul class="preset-list" id="presetList">
+          <li>Loading presets...</li>
+        </ul>
+      </aside>
+      
+      <main>
+        <div class="canvas-container">
+          <canvas id="canvas"></canvas>
+          
+          <div class="controls">
+            <div class="control-group">
+              <label>Quality:</label>
+              <select id="qualitySelect">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            
+            <div class="control-group">
+              <label>Seed:</label>
+              <input type="number" id="seedInput" value="12345" min="0" max="999999">
+            </div>
+            
+            <div class="control-group">
+              <label>Bloom:</label>
+              <input type="checkbox" id="bloomToggle" checked>
+            </div>
+            
+            <button id="pauseBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+            <button id="jsonBtn">Get Spec JSON</button>
+          </div>
+          
+          <div class="stats" id="stats">
+            <div class="stats-item">
+              <span class="stats-label">Particles:</span>
+              <span id="particleCount">0</span>
+            </div>
+            <div class="stats-item">
+              <span class="stats-label">FPS:</span>
+              <span id="fps">0</span>
+            </div>
+            <div class="stats-item">
+              <span class="stats-label">Mode:</span>
+              <span id="renderMode">N/A</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <div class="modal" id="jsonModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <h2>Effect Specification</h2>
+      <pre id="jsonContent"></pre>
+      <button id="copyBtn" style="margin-top: 15px;">Copy to Clipboard</button>
+    </div>
+  </div>
+  
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+    
+    // Import EffectGraph from CDN (replace with actual CDN URL in production)
+    // For now, we'll use a mock implementation that demonstrates the API
+    
+    // Mock implementation for demo
+    const EffectGraph = {
+      async renderEffectToCanvas(spec, canvas, opts) {
+        console.log('Rendering effect:', spec.name, opts);
+        
+        // Setup Three.js scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+        camera.position.z = 15;
+        camera.position.y = 5;
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(canvas.width, canvas.height);
+        
+        // Create simple particle system
+        const particles = new THREE.BufferGeometry();
+        const particleCount = Math.min(spec.emitters[0]?.maxParticles || 1000, 10000);
+        const positions = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount * 3; i++) {
+          positions[i] = (Math.random() - 0.5) * 10;
+        }
+        
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+          color: 0x88ccff,
+          size: 0.1,
+          transparent: true,
+          opacity: 0.6,
+          blending: THREE.AdditiveBlending
+        });
+        
+        const particleSystem = new THREE.Points(particles, material);
+        scene.add(particleSystem);
+        
+        let running = true;
+        let paused = false;
+        let frameCount = 0;
+        
+        function animate() {
+          if (!running) return;
+          requestAnimationFrame(animate);
+          
+          if (!paused) {
+            particleSystem.rotation.y += 0.001;
+            particleSystem.rotation.x += 0.0005;
+            renderer.render(scene, camera);
+            frameCount++;
+          }
+        }
+        
+        animate();
+        
+        return {
+          stop: () => { running = false; },
+          pause: () => { paused = true; },
+          resume: () => { paused = false; },
+          dispose: () => {
+            running = false;
+            particles.dispose();
+            material.dispose();
+            renderer.dispose();
+          },
+          getStats: () => ({
+            activeParticles: particleCount,
+            lastFrameMs: 16,
+            renderedFrames: frameCount,
+            renderMode: 'gpu'
+          })
+        };
+      },
+      
+      listPresets: async () => {
+        const response = await fetch('../presets/index.json');
+        return response.json();
+      },
+      
+      getPreset: async (name) => {
+        const response = await fetch(`../presets/${name}.json`);
+        return response.json();
+      }
+    };
+    
+    // App state
+    let currentHandle = null;
+    let currentSpec = null;
+    let isPaused = false;
+    
+    // Initialize
+    async function init() {
+      const canvas = document.getElementById('canvas');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = 600;
+      
+      // Load presets
+      const presets = await EffectGraph.listPresets();
+      const presetList = document.getElementById('presetList');
+      presetList.innerHTML = '';
+      
+      presets.forEach((preset, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div>${preset.name}</div>
+          <div class="preset-tags">${preset.tags.join(', ')}</div>
+        `;
+        li.addEventListener('click', () => loadPreset(preset.name));
+        if (index === 0) li.classList.add('active');
+        presetList.appendChild(li);
+      });
+      
+      // Load first preset
+      if (presets.length > 0) {
+        await loadPreset(presets[0].name);
+      }
+      
+      // Setup controls
+      setupControls();
+      
+      // Stats updater
+      setInterval(updateStats, 100);
+    }
+    
+    async function loadPreset(name) {
+      if (currentHandle) {
+        currentHandle.dispose();
+      }
+      
+      const spec = await EffectGraph.getPreset(name);
+      currentSpec = spec;
+      
+      const quality = document.getElementById('qualitySelect').value;
+      const seed = parseInt(document.getElementById('seedInput').value);
+      
+      currentHandle = await EffectGraph.renderEffectToCanvas(spec, document.getElementById('canvas'), {
+        mode: 'auto',
+        quality,
+        seed
+      });
+      
+      // Update active preset
+      document.querySelectorAll('.preset-list li').forEach(li => {
+        li.classList.toggle('active', li.textContent.includes(name));
+      });
+      
+      isPaused = false;
+      document.getElementById('pauseBtn').textContent = 'Pause';
+    }
+    
+    function setupControls() {
+      document.getElementById('pauseBtn').addEventListener('click', () => {
+        if (!currentHandle) return;
+        isPaused = !isPaused;
+        if (isPaused) {
+          currentHandle.pause();
+          document.getElementById('pauseBtn').textContent = 'Resume';
+        } else {
+          currentHandle.resume();
+          document.getElementById('pauseBtn').textContent = 'Pause';
+        }
+      });
+      
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        const activePreset = document.querySelector('.preset-list li.active');
+        if (activePreset) {
+          const name = activePreset.textContent.split('\n')[0].trim();
+          loadPreset(name);
+        }
+      });
+      
+      document.getElementById('jsonBtn').addEventListener('click', () => {
+        if (!currentSpec) return;
+        document.getElementById('jsonContent').textContent = JSON.stringify(currentSpec, null, 2);
+        document.getElementById('jsonModal').classList.add('active');
+      });
+      
+      document.getElementById('modalClose').addEventListener('click', () => {
+        document.getElementById('jsonModal').classList.remove('active');
+      });
+      
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(document.getElementById('jsonContent').textContent);
+        alert('Copied to clipboard!');
+      });
+    }
+    
+    function updateStats() {
+      if (!currentHandle) return;
+      const stats = currentHandle.getStats();
+      document.getElementById('particleCount').textContent = stats.activeParticles;
+      document.getElementById('fps').textContent = (1000 / (stats.lastFrameMs || 16)).toFixed(1);
+      document.getElementById('renderMode').textContent = (stats.renderMode || 'N/A').toUpperCase();
+    }
+    
+    // Start
+    init().catch(console.error);
+  </script>
+</body>
+</html>

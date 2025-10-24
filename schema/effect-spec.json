@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://effectgraph.dev/schema/effect-spec.json",
+  "title": "EffectSpec",
+  "description": "Complete specification for a particle effect in EffectGraph",
+  "type": "object",
+  "required": ["name", "emitters", "physics", "renderer"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Effect name/identifier",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for categorization",
+      "items": {
+        "type": "string"
+      }
+    },
+    "emitters": {
+      "type": "array",
+      "description": "List of particle emitters",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "$ref": "#/definitions/EmitterConfig"
+      }
+    },
+    "physics": {
+      "$ref": "#/definitions/PhysicsConfig"
+    },
+    "renderer": {
+      "$ref": "#/definitions/RendererConfig"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in seconds (0 = infinite loop)",
+      "minimum": 0,
+      "default": 0
+    },
+    "suggestedQuality": {
+      "type": "string",
+      "description": "Suggested quality preset",
+      "enum": ["low", "medium", "high"]
+    }
+  },
+  "definitions": {
+    "Vec3": {
+      "type": "array",
+      "description": "3D vector [x, y, z]",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "Vec4": {
+      "type": "array",
+      "description": "4D vector [x, y, z, w] or RGBA color",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "EmitterConfig": {
+      "type": "object",
+      "required": ["type", "lifetime", "velocityRange"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["point", "sphere", "box", "cone"],
+          "description": "Emitter shape"
+        },
+        "rate": {
+          "type": "number",
+          "description": "Emission rate (particles per second)",
+          "minimum": 0,
+          "maximum": 200000,
+          "default": 100
+        },
+        "maxParticles": {
+          "type": "integer",
+          "description": "Maximum particles this emitter can have alive",
+          "minimum": 1,
+          "maximum": 200000,
+          "default": 65536
+        },
+        "lifetime": {
+          "type": "array",
+          "description": "Particle lifetime range [min, max] in seconds",
+          "items": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 60
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "velocityRange": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": {
+              "$ref": "#/definitions/Vec3",
+              "description": "Minimum velocity"
+            },
+            "max": {
+              "$ref": "#/definitions/Vec3",
+              "description": "Maximum velocity"
+            }
+          }
+        },
+        "position": {
+          "$ref": "#/definitions/Vec3",
+          "description": "Emitter position offset",
+          "default": [0, 0, 0]
+        },
+        "params": {
+          "type": "object",
+          "description": "Emitter-specific parameters",
+          "properties": {
+            "radius": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Radius for sphere/cone emitters"
+            },
+            "size": {
+              "$ref": "#/definitions/Vec3",
+              "description": "Size for box emitter"
+            },
+            "angle": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 180,
+              "description": "Cone angle in degrees"
+            }
+          }
+        }
+      }
+    },
+    "PhysicsConfig": {
+      "type": "object",
+      "properties": {
+        "gravity": {
+          "$ref": "#/definitions/Vec3",
+          "description": "Gravity acceleration",
+          "default": [0, -9.8, 0]
+        },
+        "drag": {
+          "type": "number",
+          "description": "Air drag coefficient (0-1)",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.01
+        },
+        "curlNoise": {
+          "type": "boolean",
+          "description": "Enable curl noise turbulence",
+          "default": false
+        },
+        "curlNoiseFrequency": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1.0
+        },
+        "curlNoiseAmplitude": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1.0
+        },
+        "vorticity": {
+          "type": "boolean",
+          "description": "Enable vorticity confinement",
+          "default": false
+        },
+        "vorticityStrength": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1.0
+        }
+      }
+    },
+    "RendererConfig": {
+      "type": "object",
+      "required": ["mode", "particleSize", "sizeAttenuation", "blendMode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["auto", "gpu", "cpu"],
+          "default": "auto"
+        },
+        "shaderTemplate": {
+          "type": "string",
+          "enum": ["smoke", "explosion", "magic_swirl", "custom"]
+        },
+        "particleSize": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 100,
+          "default": 2.0
+        },
+        "sizeAttenuation": {
+          "type": "boolean",
+          "default": true
+        },
+        "blendMode": {
+          "type": "string",
+          "enum": ["additive", "alpha", "multiply"],
+          "default": "additive"
+        },
+        "colorRamp": {
+          "type": "array",
+          "description": "Color over lifetime",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": ["t", "color"],
+            "properties": {
+              "t": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "color": {
+                "$ref": "#/definitions/Vec4"
+              }
+            }
+          }
+        },
+        "postProcessing": {
+          "type": "object",
+          "properties": {
+            "bloom": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "strength": {
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 1.0
+                },
+                "radius": {
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.5
+                },
+                "threshold": {
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.85
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

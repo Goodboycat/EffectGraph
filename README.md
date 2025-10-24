@@ -1,466 +1,293 @@
-# EffectGraph 🎨
+# EffectGraph
 
-**An AI-Friendly VFX Description Language and Runtime for Three.js**
+> GPU-ready, AI-friendly particle & special-effects tooling for web usage
 
-EffectGraph bridges the gap between natural language AI descriptions and production-quality visual effects by providing a structured, declarative system that both humans and AI can easily understand and generate.
+[![CI](https://github.com/username/effectgraph/workflows/CI/badge.svg)](https://github.com/username/effectgraph/actions)
+[![npm version](https://badge.fury.io/js/effectgraph.svg)](https://www.npmjs.com/package/effectgraph)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 https://goodboycat.github.io/EffectGraph
 
 ## 🌟 Why EffectGraph?
 
-Current AI systems struggle with creating sophisticated 3D visual effects because they require:
-- Deep WebGL/GLSL knowledge
-- Complex particle physics understanding
-- Low-level shader programming
+EffectGraph is a production-quality TypeScript library for creating stunning particle effects and special effects in web applications. Built with GPU acceleration, deterministic behavior, and AI-friendly APIs.
 
-**EffectGraph solves this** by providing:
-- ✅ **Declarative JSON format** - AI can generate structured data easily
-- ✅ **Physics-aware** - Built-in realistic force simulations
-- ✅ **Compositional** - Mix and match proven effect patterns
-- ✅ **GPU-optimized** - Automatic performance optimization
-- ✅ **Iterative refinement** - Easy to modify parameters vs rewriting code
+## ✨ Features
+
+- 🚀 **GPU-Accelerated**: Leverages Three.js and WebGL2 for high-performance rendering
+- 🎮 **CPU Fallback**: Automatic fallback for environments without WebGL2
+- 🎨 **12 Built-in Presets**: Ready-to-use effects (explosions, smoke, fire, magic, etc.)
+- 🔒 **Resource Limits**: Hard caps on particles, memory, and emit rates
+- 🎯 **Deterministic**: Seedable RNG for reproducible effects
+- 🤖 **AI-Friendly**: Runtime validation, structured presets, and clear constraints
+- 📦 **Zero Config**: Works out of the box with sensible defaults
+- 🎭 **Headless Rendering**: Server-side image generation support
+- 📊 **Performance Monitoring**: Built-in stats and profiling
+- 🧪 **Fully Tested**: Comprehensive unit test coverage
+
+## 📦 Installation
+
+```bash
+npm install effectgraph three
+```
+
+Or with yarn:
+
+```bash
+yarn add effectgraph three
+```
+
+**Note**: Three.js is a peer dependency and must be installed separately.
 
 ## 🚀 Quick Start
 
-### Installation
+```typescript
+import { renderEffectToCanvas, getPreset } from 'effectgraph';
 
-```bash
-npm install
-npm run dev
+// Get canvas element
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+
+// Load a preset
+const explosionSpec = getPreset('explosion-large');
+
+// Render to canvas
+const handle = await renderEffectToCanvas(explosionSpec, canvas, {
+  mode: 'auto',      // Auto-select GPU or CPU
+  quality: 'high',   // low, medium, or high
+  seed: 12345        // For reproducible effects
+});
+
+// Get stats
+console.log(handle.getStats());
+// { activeParticles: 5420, lastFrameMs: 12.5, renderMode: 'gpu' }
+
+// Control the effect
+handle.pause();
+handle.resume();
+handle.stop();
+handle.dispose(); // Clean up resources
 ```
 
-Open your browser to the provided localhost URL to see the interactive demo.
+## 📚 Documentation
 
-### Basic Usage
+### Available Presets
 
-```javascript
-import { ParticleSystem } from './src/index.js';
+```typescript
+import { listPresets, getPreset } from 'effectgraph';
 
-// Define an effect using JSON
-const myEffect = {
-  name: "SimpleExplosion",
-  type: "particle",
-  
-  emitter: {
-    shape: "sphere",
-    radius: 0.5,
-    rate: { type: "constant", value: 50 }
+// List all presets
+const presets = listPresets();
+console.log(presets);
+// [
+//   { name: 'explosion-large', description: '...', tags: [...] },
+//   { name: 'smoke-spiral', description: '...', tags: [...] },
+//   ...
+// ]
+
+// Load any preset
+const preset = getPreset('magic-swirl');
+```
+
+Available presets:
+- `explosion-large` - Large explosive burst with fire
+- `explosion-small` - Quick explosive burst
+- `smoke-spiral` - Swirling smoke with vorticity
+- `smoke-dense` - Heavy smoke cloud
+- `fire-spark` - Upward fire sparks
+- `fire-embers` - Floating fire embers
+- `aurora` - Aurora borealis effect
+- `plasma-beam` - Concentrated energy beam
+- `magic-swirl` - Magical swirling particles
+- `water-spray` - Water spray with physics
+- `dust-cloud` - Ambient dust particles
+- `ember-trails` - Trailing ember particles
+
+### Custom Effects
+
+```typescript
+import { renderEffectToCanvas, validateEffectSpec } from 'effectgraph';
+import type { EffectSpec } from 'effectgraph';
+
+const customSpec: EffectSpec = {
+  name: 'my-effect',
+  description: 'Custom particle effect',
+  emitters: [{
+    type: 'sphere',
+    rate: 100,
+    maxParticles: 5000,
+    lifetime: [1, 3],
+    velocityRange: {
+      min: [-2, -2, -2],
+      max: [2, 2, 2]
+    },
+    position: [0, 0, 0],
+    params: { radius: 1 }
+  }],
+  physics: {
+    gravity: [0, -9.8, 0],
+    drag: 0.5,
+    curlNoise: true,
+    curlNoiseFrequency: 1.0,
+    curlNoiseAmplitude: 2.0
   },
-  
-  particles: {
-    maxCount: 500,
-    lifetime: { type: "uniform", min: 1.0, max: 2.0 },
-    initialVelocity: {
-      type: "uniform",
-      min: [-3, -3, -3],
-      max: [3, 3, 3]
-    }
-  },
-  
-  forces: [
-    { type: "gravity", strength: 9.8 },
-    { type: "drag", strength: 0.1 }
-  ],
-  
-  overLifetime: {
-    opacity: {
-      keyframes: [
-        { time: 0.0, value: 1.0, interpolation: "cubic" },
-        { time: 1.0, value: 0.0, interpolation: "cubic" }
-      ]
-    }
-  },
-  
-  rendering: {
-    material: {
-      type: "sprite",
-      blending: "additive"
+  renderer: {
+    mode: 'auto',
+    shaderTemplate: 'smoke',
+    particleSize: 10,
+    sizeAttenuation: true,
+    blendMode: 'additive',
+    postProcessing: {
+      bloom: {
+        enabled: true,
+        strength: 1.5
+      }
     }
   }
 };
 
-// Create and add to scene
-const system = new ParticleSystem(myEffect);
-scene.add(system.getObject3D());
-
-// Update each frame
-function animate() {
-  system.update(deltaTime);
+// Validate before using
+const result = validateEffectSpec(customSpec);
+if (result.valid) {
+  const handle = await renderEffectToCanvas(result.spec, canvas);
+} else {
+  console.error('Invalid spec:', result.errors);
 }
 ```
 
-## 📚 Core Concepts
+### Headless Rendering
 
-### 1. Effect Definition Structure
+```typescript
+import { renderEffectToImage } from 'effectgraph';
 
-Every effect is defined using a JSON structure with these main sections:
+const blob = await renderEffectToImage(preset, {
+  width: 1920,
+  height: 1080,
+  format: 'png',
+  seed: 12345
+});
 
-```javascript
-{
-  name: "EffectName",
-  type: "particle" | "mesh" | "field" | "composite",
-  emitter: { ... },      // Where particles spawn
-  particles: { ... },    // Particle properties
-  forces: [ ... ],       // Physics forces
-  overLifetime: { ... }, // Property animation curves
-  rendering: { ... }     // Visual appearance
-}
+// Save or upload the image
+const url = URL.createObjectURL(blob);
 ```
 
-### 2. Emitter Shapes
+## 🎮 Examples
 
-Define where particles are created:
+Check out the [examples](./examples) directory:
 
-- **Point** - Single point emission
-- **Sphere** - Surface or volume of sphere
-- **Box** - Rectangular volume
-- **Cone** - Cone-shaped emission (great for fire, smoke)
+- `minimal.html` - Simple smoke effect
+- `gpu.html` - Interactive preset browser with controls
 
-### 3. Distribution Types
+Run examples locally:
 
-Control randomness in particle properties:
-
-```javascript
-// Constant value
-{ type: "constant", value: 10 }
-
-// Random uniform distribution
-{ type: "uniform", min: 5, max: 15 }
-
-// Normal (Gaussian) distribution
-{ type: "normal", mean: 10, stddev: 2 }
+```bash
+npm run dev
 ```
 
-### 4. Forces
+Then open `http://localhost:5173/examples/gpu.html`
 
-Built-in physics simulations:
+## 🧪 Testing
 
-- **Gravity** - Downward acceleration
-- **Drag** - Air resistance (opposes motion)
-- **Turbulence** - Noise-based chaotic motion
-- **Vortex** - Spiral motion around axis
-- **Attractor** - Pull toward point
-- **Wind** - Directional force with gusts
-- **Buoyancy** - Upward force (hot air rising)
+```bash
+# Run tests
+npm test
 
-### 5. Over-Lifetime Curves
+# Run tests in watch mode
+npm run test:watch
 
-Animate properties over particle lifetime using keyframes:
+# Run linter
+npm run lint
 
-```javascript
-overLifetime: {
-  scale: {
-    keyframes: [
-      { time: 0.0, value: [0.1, 0.1, 0.1], interpolation: "cubic" },
-      { time: 1.0, value: [1.0, 1.0, 1.0], interpolation: "cubic" }
-    ]
-  },
-  color: {
-    keyframes: [
-      { time: 0.0, value: [1.0, 0.5, 0.0], interpolation: "linear" },
-      { time: 1.0, value: [0.2, 0.0, 0.0], interpolation: "linear" }
-    ]
-  }
-}
+# Build library
+npm run build
 ```
 
-Interpolation types: `linear`, `cubic`, `step`, `bezier`
-
-## 🎯 Example Effects
-
-### Fire Effect
-
-```javascript
-import { fireEffect } from './src/examples/fire.js';
-const system = new ParticleSystem(fireEffect);
-```
-
-Realistic fire with:
-- Upward buoyancy force
-- Turbulent motion
-- Color transition: bright yellow → orange → dark red
-- Scale growth over lifetime
-- Additive blending
-
-### Explosion Effect
-
-```javascript
-import { explosionEffect } from './src/examples/explosion.js';
-const system = new ParticleSystem(explosionEffect);
-```
-
-Burst emission with:
-- Radial outward velocity
-- Gravity pulling debris down
-- Flash → fire → smoke color progression
-- Rapid expansion then contraction
-
-### Sparkles Effect
-
-```javascript
-import { sparklesEffect } from './src/examples/sparkles.js';
-const system = new ParticleSystem(sparklesEffect);
-```
-
-Magical glitter with:
-- Sphere emission volume
-- Gentle turbulence
-- Color cycling through rainbow
-- Pulsing scale animation
-
-## 🤖 AI Integration Guide
-
-### For AI Model Developers
-
-EffectGraph is designed to be generated by AI. Here's how to integrate:
-
-#### 1. Training Data Format
-
-Your AI should learn to map natural language to EffectGraph JSON:
-
-**Input**: "Create a magical portal with swirling energy"
-
-**Output**:
-```json
-{
-  "name": "MagicalPortal",
-  "type": "particle",
-  "emitter": {
-    "shape": "cone",
-    "radius": 1.0,
-    "angle": 5,
-    "rate": { "type": "constant", "value": 100 }
-  },
-  "forces": [
-    {
-      "type": "vortex",
-      "strength": 10.0,
-      "parameters": {
-        "center": [0, 0, 0],
-        "axis": [0, 1, 0],
-        "radius": 3.0
-      }
-    }
-  ],
-  "overLifetime": {
-    "color": {
-      "keyframes": [
-        { "time": 0.0, "value": [0.3, 0.5, 1.0], "interpolation": "linear" },
-        { "time": 1.0, "value": [0.8, 0.2, 1.0], "interpolation": "linear" }
-      ]
-    }
-  },
-  "rendering": {
-    "material": {
-      "blending": "additive"
-    }
-  }
-}
-```
-
-#### 2. Semantic Understanding
-
-Train your AI to understand these relationships:
-
-**Physics**:
-- Gravity → downward motion
-- Drag → slowing over time
-- Buoyancy → upward motion (fire, hot air)
-- Turbulence → chaotic, organic motion
-
-**Visual**:
-- Fire → additive blending, yellow-to-red colors
-- Smoke → normal/multiply blending, gray colors
-- Magic → additive blending, vibrant colors
-- Water → translucent, blue-white colors
-
-**Temporal**:
-- Short lifetime → quick effects (sparks, debris)
-- Long lifetime → ambient effects (smoke, fog)
-- Fade in/out → smooth appearance/disappearance
-
-#### 3. Compositional Patterns
-
-Common effect compositions:
-
-**Fire = Core Flame + Smoke + Embers**
-```javascript
-{
-  "type": "composite",
-  "layers": [
-    { /* bright additive core */ },
-    { /* darker smoke */ },
-    { /* small spark particles */ }
-  ]
-}
-```
-
-**Explosion = Flash + Shockwave + Debris + Smoke**
-**Waterfall = Water particles + Mist + Splash + Foam**
-
-#### 4. Prompt Engineering
-
-When asking AI to generate effects:
-
-```
-Generate an EffectGraph JSON definition for a [EFFECT_TYPE] with:
-
-Physical properties:
-- Emission rate: [PARTICLES_PER_SECOND]
-- Lifetime: [DURATION_SECONDS]
-- Primary motion: [DIRECTION/BEHAVIOR]
-- Forces: [FORCE_LIST]
-
-Visual appearance:
-- Color: [START_COLOR] → [END_COLOR]
-- Size: [START_SIZE] → [END_SIZE]
-- Blending: [additive/normal/multiply]
-
-Style reference:
-- Similar to: [EXISTING_EFFECT]
-```
-
-#### 5. Constraints & Validation
-
-Ensure AI-generated effects satisfy:
-
-```javascript
-{
-  maxParticles: 10000,        // Performance limit
-  lifetimeRange: [0.1, 10.0], // Reasonable durations
-  velocityRange: [-100, 100], // Realistic speeds
-  forceMax: 50.0,            // Prevent simulation explosion
-  
-  // Visual coherence
-  colorValid: true,           // RGB in [0,1] range
-  blendingCompatible: true    // Correct layer order
-}
-```
-
-## 🏗️ Project Structure
+## 📐 Architecture
 
 ```
 effectgraph/
 ├── src/
-│   ├── core/
-│   │   ├── types.js           # Type definitions & distributions
-│   │   ├── Particle.js        # Particle class
-│   │   ├── Emitter.js         # Emitter shapes
-│   │   └── ParticleSystem.js  # Main system class
-│   ├── forces/
-│   │   └── Force.js           # All force implementations
-│   ├── math/
-│   │   └── curve.js           # Curve evaluation & interpolation
-│   ├── examples/
-│   │   ├── fire.js            # Fire effect example
-│   │   ├── smoke.js           # Smoke effect example
-│   │   ├── explosion.js       # Explosion effect example
-│   │   └── sparkles.js        # Sparkles effect example
-│   └── index.js               # Main exports
-├── public/                    # Static assets
-├── index.html                 # Demo page
-├── main.js                    # Demo application
-└── package.json
+│   ├── api/          # Public API & validation
+│   ├── core/         # Particle system & physics
+│   ├── rendering/    # GPU & CPU renderers
+│   ├── shaders/      # GLSL shader snippets & templates
+│   └── util/         # Utilities (RNG, math, perf)
+├── presets/          # Built-in effect presets
+├── examples/         # Example HTML pages
+├── tests/            # Unit tests
+└── docs/             # GitHub Pages demo
 ```
 
-## 🔬 Mathematical Foundation
+## 🔧 Configuration
 
-### Particle Dynamics
+### Resource Limits
 
-Position integration using Velocity Verlet:
+EffectGraph enforces hard resource limits to prevent performance issues:
 
-```
-x(t + Δt) = x(t) + v(t)·Δt + ½a(t)·Δt²
-v(t + Δt) = v(t) + ½[a(t) + a(t + Δt)]·Δt
-```
+```typescript
+import { LIMITS } from 'effectgraph';
 
-Force accumulation:
-```
-F_total = Σ F_i
-a = F_total / m
-```
-
-### Noise-Based Motion
-
-Turbulence using layered Simplex noise:
-
-```
-turbulence(p, t) = Σ(i=0 to octaves) amplitude_i · noise(frequency_i · p + t)
-  where amplitude_i = persistence^i
-        frequency_i = 2^i
+console.log(LIMITS);
+// {
+//   MAX_PARTICLES: 200000,
+//   DEFAULT_MAX_PARTICLES: 65536,
+//   MAX_TEXTURE_SIZE: 2048,
+//   MAX_EMIT_RATE: 200000,
+//   MAX_EMITTERS: 10,
+//   MAX_LIFETIME: 60,
+//   MAX_COLOR_STOPS: 16
+// }
 ```
 
-### Interpolation
+Specs exceeding these limits will be clamped or rejected during validation.
 
-Hermite cubic interpolation for smooth curves:
+## 🤖 AI Integration
 
-```
-h(t) = (2t³ - 3t² + 1)·p₀ + 
-       (t³ - 2t² + t)·m₀ + 
-       (-2t³ + 3t²)·p₁ + 
-       (t³ - t²)·m₁
-```
+EffectGraph is designed to be AI-friendly:
 
-## 🎓 Advanced Topics
+1. **Structured Presets**: All presets are JSON with clear schemas
+2. **Runtime Validation**: Comprehensive error messages for invalid specs
+3. **Deterministic**: Seedable RNG for reproducible results
+4. **Resource Constraints**: Hard limits prevent runaway generation
+5. **Machine-Readable**: `presets/index.json` and `schema/effect-spec.json`
 
-### Custom Forces
+## 🌐 Browser Support
 
-Create your own force types:
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Node.js 18+ (headless rendering)
 
-```javascript
-import { Force } from './src/forces/Force.js';
-
-class CustomForce extends Force {
-  calculate(particle) {
-    // Your force calculation
-    return new THREE.Vector3(fx, fy, fz);
-  }
-}
-```
-
-### GPU Simulation
-
-For effects with >10,000 particles, implement GPU compute shaders for position updates.
-
-### LOD (Level of Detail)
-
-Automatically reduce particle count based on camera distance:
-
-```javascript
-optimization: {
-  lod: [
-    { distance: 0, particleCount: 1.0 },
-    { distance: 50, particleCount: 0.5 },
-    { distance: 100, particleCount: 0.2 }
-  ]
-}
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Areas of interest:
-
-- New force types (magnetism, fluid flow, etc.)
-- Additional emitter shapes (mesh surface emission)
-- Material types (trails, ribbons)
-- Collision detection
-- Performance optimizations
-- Example effects library
-- AI training datasets
+WebGL2 is required for GPU rendering. The library automatically falls back to CPU rendering when WebGL2 is unavailable.
 
 ## 📄 License
 
-Apache 2.0 License - See LICENSE file for details
+MIT © [Your Name]
 
-## 🙏 Acknowledgments
+## 🤝 Contributing
 
-Inspired by:
-- Unreal Engine's Niagara VFX system
-- Unity's Shuriken particle system
-- Houdini's procedural workflows
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-Built for the AI generation revolution in creative tools.
+## 🐛 Known Issues
+
+- Server-side headless rendering requires additional setup (headless-gl or containerized browser)
+- Safari may have reduced performance compared to Chrome
+- Mobile devices may require lower quality settings
+
+## 🚀 Roadmap
+
+- [ ] WebGPU renderer
+- [ ] More shader templates
+- [ ] Collision detection
+- [ ] Texture atlases for sprites
+- [ ] More post-processing effects
+- [ ] Better mobile performance
+
+## 📞 Support
+
+- [GitHub Issues](https://github.com/username/effectgraph/issues)
+- [Documentation](https://username.github.io/effectgraph)
+- [Examples](https://username.github.io/effectgraph/examples)
 
 ---
 
-**Made with ❤️ for AI-powered creativity**
+Made with ❤️ for the web

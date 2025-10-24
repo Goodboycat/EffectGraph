@@ -26,7 +26,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\" \"examples/**/*.ts\" \"tests/**/*.ts\"",
     "typecheck": "tsc --noEmit",
-    "check-examples": "node scripts/check-examples.js"
+    "check-examples": "node scripts/check-examples.cjs"
   },
   "keywords": [
     "particle-system",
